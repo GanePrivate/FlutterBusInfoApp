@@ -1,0 +1,77 @@
+name: Android CD
+
+#発火条件
+on:
+  push:
+    tags: '*ver.*'
+
+jobs:
+  build:
+    #ビルド環境
+    runs-on: ubuntu-latest
+
+    steps:
+      #リポジトリからソースをダンロード
+      - uses: actions/checkout@v2
+      #JAVA環境構築
+      - name: install java 17.0.2
+        uses: actions/setup-java@v1
+        with:
+          java-version: '17.0.2'
+
+      - name: setup cache
+        uses: actions/cache@v1
+        with:
+          path: /Users/runner/hostedtoolcache/flutter
+          key: ${{ runner.OS }}-flutter-install-cache
+
+      #Flutter環境構築
+      - name: install flutter
+        uses: subosito/flutter-action@v1
+        with:
+          #Flutterのバージョン
+          flutter-version: '3.0.5'
+          channel: 'stable'
+
+      - name: flutter dependencies install
+        #ライブラリーの導入
+        run: flutter pub get
+
+      - name: build apk
+        run: |
+          flutter build apk --release
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v1.0.0
+        with:
+          name: android
+          path: build/app/outputs/flutter-apk/app-release.apk
+
+  release:
+    name: Release APK
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download APK from build
+        uses: actions/download-artifact@v1
+        with:
+          name: android  
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }} 
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }} 
+      - name: Upload Release APK
+        id: upload_release_asset
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: android/app-release.apk
+          asset_name: StayWatchApp.apk
+          asset_content_type: application/zip
