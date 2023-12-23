@@ -37,7 +37,7 @@ class _ToYakusaBusState extends State<ToYakusa> {
     while (true) {
       try {
         // Getクエリの発行と実行
-        var response = await http.get(Uri.http(
+        var response = await http.get(Uri.https(
             'bus-api.bigbell.dev', '/api/v1/nextbus', {'offset': '0'}));
 
         // レスポンスをjson形式にデコードして取得
@@ -64,7 +64,7 @@ class _ToYakusaBusState extends State<ToYakusa> {
     while (true) {
       try {
         // Getクエリの発行と実行
-        var response = await http.get(Uri.http(
+        var response = await http.get(Uri.https(
             'bus-api.bigbell.dev', '/api/v1/nextbus', {'offset': '1'}));
 
         // レスポンスをjson形式にデコードして取得
@@ -134,21 +134,21 @@ class _ToYakusaBusState extends State<ToYakusa> {
             const Divider(),
             Container(
               height: 50,
-              color: Colors.blue[900],
+              color: const Color(0xFF7BD3EA),
               child: const Center(
                   child: Text(
                 'Next',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: Colors.black,
                 ),
               )),
             ),
             Container(
               height: 100,
               margin: const EdgeInsets.only(bottom: 10.0),
-              color: Colors.lightBlue[100],
+              color: const Color(0xFF7BD3EA).withOpacity(0.5),
               child: Center(
                   child: Text(
                 '${(nextBusInfo['busState']['IsExist'] && nextBusInfo['nextHourToYakusa'] != -1) || nextBusInfo['busState']['IsFirst'] ? nextBusInfo['nextHourToYakusa'].toString().padLeft(2, '0') : "運行終了"}'
@@ -162,24 +162,50 @@ class _ToYakusaBusState extends State<ToYakusa> {
             const Divider(),
             Container(
               height: 50,
-              color: Colors.pink[900],
+              color: const Color(0xFFA1EEBD),
               child: const Center(
                   child: Text(
                 'After the Next',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: Colors.black,
                 ),
               )),
             ),
             Container(
               height: 100,
-              color: Colors.pink[50],
+              color: const Color(0xFFA1EEBD).withOpacity(0.5),
               child: Center(
                   child: Text(
                 '${(afterNextBusInfo['busState']['IsExist'] && afterNextBusInfo['nextHourToYakusa'] != -1) || afterNextBusInfo['busState']['IsFirst'] ? afterNextBusInfo['nextHourToYakusa'].toString().padLeft(2, '0') : "運行終了"}'
                 '${(afterNextBusInfo['busState']['IsExist'] && afterNextBusInfo['nextHourToYakusa'] != -1) || afterNextBusInfo['busState']['IsFirst'] ? ':${afterNextBusInfo['nextMinuteToYakusa'].toString().padLeft(2, '0')}' : ""}',
+                style: const TextStyle(
+                  fontSize: 45,
+                  fontWeight: FontWeight.bold,
+                ),
+              )),
+            ),
+            const Divider(),
+            Container(
+              height: 50,
+              color: const Color(0xFFF6F7C4),
+              child: const Center(
+                  child: Text(
+                '運行ダイヤ',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              )),
+            ),
+            Container(
+              height: 100,
+              color: const Color(0xFFF6F7C4).withOpacity(0.5),
+              child: Center(
+                  child: Text(
+                '${nextBusInfo['schedule']}',
                 style: const TextStyle(
                   fontSize: 45,
                   fontWeight: FontWeight.bold,
