@@ -33,58 +33,66 @@ class _ToAITBusState extends State<ToAIT> {
   Map<String, dynamic> nextBusInfo = {};
   Map<String, dynamic> afterNextBusInfo = {};
   bool isLoading = false;
+  bool isGetNextInfoFirst = true;
+  bool isGetAfterNextInfoFirst = true;
 
   // Futureで非同期処理
   Future<void> getNextInfo() async {
     while (true) {
-      try {
-        // Getクエリの発行と実行
-        var response = await http.get(
-            Uri.https('bus-api.bigbell.dev', '/api/v1/nextbus', {'offset': '0'}));
+      if (DateTime.now().second == 0 || isGetNextInfoFirst) {
+        try {
+          // Getクエリの発行と実行
+          var response = await http.get(Uri.https(
+              'bus-api.bigbell.dev', '/api/v1/nextbus', {'offset': '0'}));
 
-        // レスポンスをjson形式にデコードして取得
-        var jsonResponse = jsonDecode(response.body);
+          // レスポンスをjson形式にデコードして取得
+          var jsonResponse = jsonDecode(response.body);
 
-        // ステートに登録(画面に反映させる)
-        if (mounted) {
-          setState(() {
-            nextBusInfo = jsonResponse;
-            isLoading = true;
-          });
+          // ステートに登録(画面に反映させる)
+          if (mounted) {
+            setState(() {
+              nextBusInfo = jsonResponse;
+              isLoading = true;
+            });
+          }
+        } catch (e) {
+          debugPrint(e.toString());
+          isGetNextInfoFirst = true;
         }
-
-        // 5秒スリープ
-        await Future.delayed(const Duration(seconds: 5));
-      } catch (e) {
-        debugPrint(e.toString());
       }
+      isGetNextInfoFirst = false;
+      // 1秒スリープ
+      await Future.delayed(const Duration(seconds: 1));
     }
   }
 
   // Futureで非同期処理
   Future<void> getAfterNextInfo() async {
     while (true) {
-      try {
-        // Getクエリの発行と実行
-        var response = await http.get(
-            Uri.https('bus-api.bigbell.dev', '/api/v1/nextbus', {'offset': '1'}));
+      if (DateTime.now().second == 0 || isGetAfterNextInfoFirst) {
+        try {
+          // Getクエリの発行と実行
+          var response = await http.get(Uri.https(
+              'bus-api.bigbell.dev', '/api/v1/nextbus', {'offset': '1'}));
 
-        // レスポンスをjson形式にデコードして取得
-        var jsonResponse = jsonDecode(response.body);
+          // レスポンスをjson形式にデコードして取得
+          var jsonResponse = jsonDecode(response.body);
 
-        // ステートに登録(画面に反映させる)
-        if (mounted) {
-          setState(() {
-            afterNextBusInfo = jsonResponse;
-            isLoading = true;
-          });
+          // ステートに登録(画面に反映させる)
+          if (mounted) {
+            setState(() {
+              afterNextBusInfo = jsonResponse;
+              isLoading = true;
+            });
+          }
+        } catch (e) {
+          debugPrint(e.toString());
+          isGetAfterNextInfoFirst = true;
         }
-
-        // 5秒スリープ
-        await Future.delayed(const Duration(seconds: 5));
-      } catch (e) {
-        debugPrint(e.toString());
       }
+      isGetAfterNextInfoFirst = false;
+      // 1秒スリープ
+      await Future.delayed(const Duration(seconds: 1));
     }
   }
 
