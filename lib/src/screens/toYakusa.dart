@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import '../widget/timeTable.dart';
 import 'loadAnimation.dart';
 
 class ToYakusaScreen extends StatelessWidget {
@@ -220,6 +221,21 @@ class _ToYakusaBusState extends State<ToYakusa> {
                 ),
               )),
             ),
+            const Divider(),
+            Container(
+              height: 50,
+              color: const Color(0xFFF6D6D6),
+              child: const Center(
+                  child: Text(
+                '運行スケジュール',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              )),
+            ),
+            createScheduleTableContainer(nextBusInfo['schedule'] + '2'),
           ],
         ),
       );
