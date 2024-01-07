@@ -7,4 +7,4 @@ https://bus.bigbell.dev/
 https://github.com/GanePrivate/FlutterBusInfoApp/releases/latest
 
 ## 動作デモ
-![output](https://github.com/GanePrivate/FlutterBusInfoApp/assets/39085974/b38edcc9-7f53-41b3-b834-81515e5c82f9)
+![output](https://github.com/GanePrivate/FlutterBusInfoApp/assets/39085974/3787dff4-1800-4f25-af79-4c62113eedc0)
