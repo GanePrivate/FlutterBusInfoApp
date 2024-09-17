@@ -235,7 +235,7 @@ class _ToYakusaBusState extends State<ToYakusa> {
                 ),
               )),
             ),
-            createScheduleTableContainer(nextBusInfo['schedule'] + '2'),
+            createScheduleTableContainer(nextBusInfo['schedule'] + '2', const Color(0xFFF6D6D6).withOpacity(0.5)),
           ],
         ),
       );

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-StatelessWidget createScheduleTableContainer(String schedule) {
+StatelessWidget createScheduleTableContainer(String schedule ,Color color) {
   if (schedule == 'A1') {
     return Container(
-      color: const Color(0xFFF6D6D6).withOpacity(0.5),
+      color: color,
       child: Center(
         child: SingleChildScrollView(
           scrollDirection: Axis.vertical,
@@ -103,7 +103,7 @@ StatelessWidget createScheduleTableContainer(String schedule) {
     );
   } else if (schedule == 'A2') {
     return Container(
-      color: const Color(0xFFF6D6D6).withOpacity(0.5),
+      color: color,
       child: Center(
         child: SingleChildScrollView(
           scrollDirection: Axis.vertical,
@@ -203,7 +203,7 @@ StatelessWidget createScheduleTableContainer(String schedule) {
     );
   } else if (schedule == 'B1') {
     return Container(
-      color: const Color(0xFFF6D6D6).withOpacity(0.5),
+      color: color,
       child: Center(
         child: SingleChildScrollView(
           scrollDirection: Axis.vertical,
@@ -301,7 +301,7 @@ StatelessWidget createScheduleTableContainer(String schedule) {
     );
   } else if (schedule == 'B2') {
     return Container(
-      color: const Color(0xFFF6D6D6).withOpacity(0.5),
+      color: color,
       child: Center(
         child: SingleChildScrollView(
           scrollDirection: Axis.vertical,
@@ -399,7 +399,7 @@ StatelessWidget createScheduleTableContainer(String schedule) {
     );
   } else if (schedule == 'C1') {
     return Container(
-      color: const Color(0xFFF6D6D6).withOpacity(0.5),
+      color: color,
       child: Center(
         child: SingleChildScrollView(
           scrollDirection: Axis.vertical,
@@ -497,7 +497,7 @@ StatelessWidget createScheduleTableContainer(String schedule) {
     );
   } else if (schedule == 'C2') {
     return Container(
-      color: const Color(0xFFF6D6D6).withOpacity(0.5),
+      color: color,
       child: Center(
         child: SingleChildScrollView(
           scrollDirection: Axis.vertical,
