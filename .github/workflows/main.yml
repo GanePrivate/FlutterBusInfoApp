@@ -65,14 +65,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }} 
         with:
           tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }} 
-      - name: Upload Release APK
-        id: upload_release_asset
-        uses: actions/upload-release-asset@v1.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: android/app-release.apk
-          asset_name: AIT-busInfoApp.apk
-          asset_content_type: application/zip
+          release_name: Release ${{ github.ref }}
+#      - name: Upload Release APK
+#        uses: softprops/action-gh-release@v2
+#        with:
+#          files: android/app-release.apk
+#          token: ${{ secrets.GH_PAT }}
