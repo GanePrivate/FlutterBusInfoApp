@@ -56,7 +56,8 @@ jobs:
       - name: Download APK from build
         uses: actions/download-artifact@v3
         with:
-          name: android  
+          name: android
+          path: .
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -72,6 +73,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: /home/runner/work/FlutterBusInfoApp/FlutterBusInfoApp
+          asset_path: android/app-release.apk
           asset_name: AIT-busInfoApp.apk
           asset_content_type: application/zip
