@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bus_app/src/screens/allSchedule.dart';
 
 import 'screens/toAit.dart';
 import 'screens/toYakusa.dart';
@@ -26,7 +27,7 @@ class MyStatefulWidget extends StatefulWidget {
 }
 
 class _MyStatefulWidgetState extends State<MyStatefulWidget> {
-  static const _screens = [HomeScreen(), ToYakusaScreen()];
+  static const _screens = [HomeScreen(), ToYakusaScreen(), ScheduleScreen()];
 
   int _selectedIndex = 0;
 
@@ -47,6 +48,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
             BottomNavigationBarItem(icon: Icon(Icons.school_outlined), label: '大学行き'),
             BottomNavigationBarItem(
                 icon: Icon(Icons.train_outlined), label: '八草行き'),
+            BottomNavigationBarItem(icon: Icon(Icons.schedule), label: '全ダイヤ')
           ],
           type: BottomNavigationBarType.fixed,
         ));

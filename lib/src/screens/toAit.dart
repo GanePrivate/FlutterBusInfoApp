@@ -237,7 +237,7 @@ class _ToAITBusState extends State<ToAIT> {
                 ),
               )),
             ),
-            createScheduleTableContainer(nextBusInfo['schedule'] + '1'),
+            createScheduleTableContainer(nextBusInfo['schedule'] + '1', const Color(0xFFF6D6D6).withOpacity(0.5)),
           ],
         ),
       );
