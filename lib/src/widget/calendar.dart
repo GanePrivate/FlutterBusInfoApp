@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../assets/scheduleCSV.dart';
 
 class CalendarWidget extends StatelessWidget {
@@ -7,47 +6,46 @@ class CalendarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dateModeMap = _parseCsvData(csvData);
-    final calendarData = _organizeDataByMonth(dateModeMap);
+    return FutureBuilder<Map<DateTime, String>>(
+      future: fetchScheduleData(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Center(child: Text('No data available'));
+        } else {
+          final dateModeMap = snapshot.data!;
+          final calendarData = _organizeDataByMonth(dateModeMap);
 
-    return SingleChildScrollView(
-      child: Container(
-        color: Color(0xFFF6F7C4).withOpacity(0.5),
-        child: Column(
-          children: calendarData.entries.map((entry) {
-            final year = entry.key.year;
-            final month = entry.key.month;
-            final days = entry.value;
+          return SingleChildScrollView(
+            child: Container(
+              color: const Color(0xFFF6F7C4).withOpacity(0.5),
+              child: Column(
+                children: calendarData.entries.map((entry) {
+                  final year = entry.key.year;
+                  final month = entry.key.month;
+                  final days = entry.value;
 
-            return Column(
-              children: [
-                Text('$year年$month月',
-                    style:
-                        TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-                Table(
-                  border: TableBorder.all(),
-                  children: _buildCalendar(year, month, days),
-                ),
-              ],
-            );
-          }).toList(),
-        ),
-      ),
+                  return Column(
+                    children: [
+                      Text('$year年$month月',
+                          style: const TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.bold)),
+                      Table(
+                        border: TableBorder.all(),
+                        children: _buildCalendar(year, month, days),
+                      ),
+                    ],
+                  );
+                }).toList(),
+              ),
+            ),
+          );
+        }
+      },
     );
-  }
-
-  Map<DateTime, String> _parseCsvData(String csvData) {
-    final lines = csvData.trim().split('\n');
-    final dateModeMap = <DateTime, String>{};
-
-    for (var line in lines) {
-      final parts = line.split(',');
-      final date = DateTime.parse(parts[0]);
-      final mode = parts.length > 1 ? parts[1] : '';
-      dateModeMap[date] = mode;
-    }
-
-    return dateModeMap;
   }
 
   Map<DateTime, List<MapEntry<int, String>>> _organizeDataByMonth(
@@ -56,7 +54,10 @@ class CalendarWidget extends StatelessWidget {
 
     dateModeMap.forEach((date, mode) {
       final yearMonth = DateTime(date.year, date.month);
+      // calendarData に yearMonth の Key がなければ
+      // (Datetime : 空のリスト) のデータを追加
       calendarData.putIfAbsent(yearMonth, () => []);
+      // 上記で追加したリストに実際に日付と mode のデータを追加
       calendarData[yearMonth]!.add(MapEntry(date.day, mode));
     });
 

@@ -1,599 +1,91 @@
 import 'package:flutter/material.dart';
+import '../util/fetchTimeTable.dart';
 
-StatelessWidget createScheduleTableContainer(String schedule ,Color color) {
-  if (schedule == 'A1') {
-    return Container(
-      color: color,
-      child: Center(
-        child: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: DataTable(
-              columns: const <DataColumn>[
-                DataColumn(label: Text('時', style: TextStyle(fontSize: 16))),
-                DataColumn(label: Text('分', style: TextStyle(fontSize: 16))),
-                DataColumn(label: Text('時', style: TextStyle(fontSize: 16))),
-                DataColumn(label: Text('分', style: TextStyle(fontSize: 16))),
-              ],
-              rows: const <DataRow>[
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('8',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(
-                      Text(
-                          '00,  05,  10,  15,  20,  25,\n30,  35,  40,  45,  50,  55'),
-                    ),
-                    DataCell(Text('15',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('05,  15,  30,  45')),
+Widget createScheduleTableContainer(String schedule, Color color) {
+  final scheduleMap = {
+    "A1": "A_toAIT",
+    "B1": "B_toAIT",
+    "C1": "C_toAIT",
+    "A2": "A_toYakusa",
+    "B2": "B_toYakusa",
+    "C2": "C_toYakusa",
+  };
+  schedule = scheduleMap[schedule] ?? schedule;
+
+  return FutureBuilder<Map<String, Map<int, List<int>>>>(
+    future: fetchTimeTableData(),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return const Center(child: CircularProgressIndicator());
+      } else if (snapshot.hasError) {
+        return Center(child: Text('Error: ${snapshot.error}'));
+      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+        return const Center(child: Text('No data available'));
+      } else {
+        final timeTableData = snapshot.data!;
+        final scheduleData = timeTableData[schedule] ?? {};
+
+        // minutes が null の物を除外し、時間順にソートする
+        final sortedScheduleData = scheduleData.entries
+            .where((entry) => entry.value.isNotEmpty)
+            .toList()
+          ..sort((a, b) => a.key.compareTo(b.key));
+
+        // 0~14時と15~24時のデータを分ける
+        final leftColumnData = sortedScheduleData.where((entry) => entry.key <= 14).toList();
+        final rightColumnData = sortedScheduleData.where((entry) => entry.key > 14).toList();
+
+        // 右側の列のデータを上から表示するために、最大行数を取得
+        final maxRows = leftColumnData.length > rightColumnData.length ? leftColumnData.length : rightColumnData.length;
+
+        return Container(
+          color: color,
+          child: Center(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: DataTable(
+                  columns: const <DataColumn>[
+                    DataColumn(
+                        label: Text('時', style: TextStyle(fontSize: 16))),
+                    DataColumn(
+                        label: Text('分', style: TextStyle(fontSize: 16))),
+                    DataColumn(
+                        label: Text('時', style: TextStyle(fontSize: 16))),
+                    DataColumn(
+                        label: Text('分', style: TextStyle(fontSize: 16))),
                   ],
+                  rows: List<DataRow>.generate(maxRows, (index) {
+                    final leftEntry = index < leftColumnData.length ? leftColumnData[index] : null;
+                    final rightEntry = index < rightColumnData.length ? rightColumnData[index] : null;
+
+                    String formatMinutes(List<int> minutes) {
+                      final formattedMinutes = minutes.map((minute) => minute.toString().padLeft(2, '0')).toList();
+                      if (formattedMinutes.length <= 6) {
+                        return formattedMinutes.join(', ');
+                      } else {
+                        return formattedMinutes.sublist(0, 6).join(', ') + '\n' + formattedMinutes.sublist(6).join(', ');
+                      }
+                    }
+
+                    return DataRow(
+                      cells: <DataCell>[
+                        DataCell(Text(leftEntry?.key.toString() ?? '',
+                            style: TextStyle(fontWeight: FontWeight.bold))),
+                        DataCell(Text(leftEntry != null ? formatMinutes(leftEntry.value) : '')),
+                        DataCell(Text(rightEntry?.key.toString() ?? '',
+                            style: TextStyle(fontWeight: FontWeight.bold))),
+                        DataCell(Text(rightEntry != null ? formatMinutes(rightEntry.value) : '')),
+                      ],
+                    );
+                  }),
                 ),
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('9',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(
-                      Text(
-                          '00,  05,  10,  15,  20,  25,\n30,  35,  40,  50, 55'),
-                    ),
-                    DataCell(Text('16',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('00,  15,  30,  45')),
-                  ],
-                ),
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('10',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(
-                      Text('00,  05,  10,  15,  20,  25,\n30,  35,  45,  55'),
-                    ),
-                    DataCell(Text('17',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('00,  10,  25,  40')),
-                  ],
-                ),
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('11',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('05,  15,  25,  35,  45,  55')),
-                    DataCell(Text('18',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('00,  15,  45')),
-                  ],
-                ),
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('12',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('05,  15,  25,  35,  45,  55')),
-                    DataCell(Text('19',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('00,  15,  30,  45')),
-                  ],
-                ),
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('13',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('05,  20,  35,  50')),
-                    DataCell(Text('20',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('00,  30')),
-                  ],
-                ),
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('14',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('05,  15,  25,  35,  45,  55')),
-                    DataCell(Text('21',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('00')),
-                  ],
-                ),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
-    );
-  } else if (schedule == 'A2') {
-    return Container(
-      color: color,
-      child: Center(
-        child: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: DataTable(
-              columns: const <DataColumn>[
-                DataColumn(label: Text('時', style: TextStyle(fontSize: 16))),
-                DataColumn(label: Text('分', style: TextStyle(fontSize: 16))),
-                DataColumn(label: Text('時', style: TextStyle(fontSize: 16))),
-                DataColumn(label: Text('分', style: TextStyle(fontSize: 16))),
-              ],
-              rows: const <DataRow>[
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('8',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(
-                      Text('20,  50'),
-                    ),
-                    DataCell(Text('15',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('00,  10,  20,  30,  40,  50')),
-                  ],
-                ),
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('9',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(
-                      Text('20,  50'),
-                    ),
-                    DataCell(Text('16',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text(
-                        '00,  05,  10,  15,  25,  30,\n35,  40,  45,  50,  55')),
-                  ],
-                ),
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('10',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(
-                      Text('20 50'),
-                    ),
-                    DataCell(Text('17',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text(
-                        '00,  10,  15,  20,  25,  30,\n35,  40,  45,  55')),
-                  ],
-                ),
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('11',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('00,  10,  20,  30,  40,  50')),
-                    DataCell(Text('18',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('00,  10,  20,  30,  40,  50')),
-                  ],
-                ),
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('12',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('00,  10,  20,  30,  40,  50')),
-                    DataCell(Text('19',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('00,  15,  30,  45')),
-                  ],
-                ),
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('13',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('00,  15,  30,  45')),
-                    DataCell(Text('20',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('00,  15,  30,  45')),
-                  ],
-                ),
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('14',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('00,  10,  20,  30,  40,  45,\n50,  55')),
-                    DataCell(Text('21',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('00,  15,  30,  45')),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  } else if (schedule == 'B1') {
-    return Container(
-      color: color,
-      child: Center(
-        child: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: DataTable(
-              columns: const <DataColumn>[
-                DataColumn(label: Text('時', style: TextStyle(fontSize: 16))),
-                DataColumn(label: Text('分', style: TextStyle(fontSize: 16))),
-                DataColumn(label: Text('時', style: TextStyle(fontSize: 16))),
-                DataColumn(label: Text('分', style: TextStyle(fontSize: 16))),
-              ],
-              rows: const <DataRow>[
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('8',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(
-                      Text('00,  10,  20,  35,  45'),
-                    ),
-                    DataCell(Text('15',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('05,  35')),
-                  ],
-                ),
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('9',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(
-                      Text('00,  05,  25,  35,  50'),
-                    ),
-                    DataCell(Text('16',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('05,  45')),
-                  ],
-                ),
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('10',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(
-                      Text('00,  10,  30,  55'),
-                    ),
-                    DataCell(Text('17',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('10,  45')),
-                  ],
-                ),
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('11',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('00,  25,  50')),
-                    DataCell(Text('18',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('05,  35')),
-                  ],
-                ),
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('12',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('25')),
-                    DataCell(Text('19',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('35')),
-                  ],
-                ),
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('13',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('35')),
-                    DataCell(Text('20',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('25')),
-                  ],
-                ),
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('14',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('05,  35')),
-                    DataCell(Text('21',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('05')),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  } else if (schedule == 'B2') {
-    return Container(
-      color: color,
-      child: Center(
-        child: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: DataTable(
-              columns: const <DataColumn>[
-                DataColumn(label: Text('時', style: TextStyle(fontSize: 16))),
-                DataColumn(label: Text('分', style: TextStyle(fontSize: 16))),
-                DataColumn(label: Text('時', style: TextStyle(fontSize: 16))),
-                DataColumn(label: Text('分', style: TextStyle(fontSize: 16))),
-              ],
-              rows: const <DataRow>[
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('8',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(
-                      Text('50'),
-                    ),
-                    DataCell(Text('15',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('20,  50')),
-                  ],
-                ),
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('9',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(
-                      Text('40'),
-                    ),
-                    DataCell(Text('16',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('20')),
-                  ],
-                ),
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('10',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(
-                      Text('05,  50'),
-                    ),
-                    DataCell(Text('17',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('00,  30,  55')),
-                  ],
-                ),
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('11',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('15,  40')),
-                    DataCell(Text('18',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('20,  50')),
-                  ],
-                ),
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('12',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('10')),
-                    DataCell(Text('19',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('20,  50')),
-                  ],
-                ),
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('13',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('20,  50')),
-                    DataCell(Text('20',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('40')),
-                  ],
-                ),
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('14',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('20,  50')),
-                    DataCell(Text('21',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('30')),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  } else if (schedule == 'C1') {
-    return Container(
-      color: color,
-      child: Center(
-        child: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: DataTable(
-              columns: const <DataColumn>[
-                DataColumn(label: Text('時', style: TextStyle(fontSize: 16))),
-                DataColumn(label: Text('分', style: TextStyle(fontSize: 16))),
-                DataColumn(label: Text('時', style: TextStyle(fontSize: 16))),
-                DataColumn(label: Text('分', style: TextStyle(fontSize: 16))),
-              ],
-              rows: const <DataRow>[
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('8',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(
-                      Text('10,  35'),
-                    ),
-                    DataCell(Text('15',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('05,  35')),
-                  ],
-                ),
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('9',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(
-                      Text('00,  25,  50'),
-                    ),
-                    DataCell(Text('16',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('05,  45')),
-                  ],
-                ),
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('10',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(
-                      Text('10,  55'),
-                    ),
-                    DataCell(Text('17',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('10,  45')),
-                  ],
-                ),
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('11',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('25,  50')),
-                    DataCell(Text('18',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('5,  35')),
-                  ],
-                ),
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('12',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('25')),
-                    DataCell(Text('19',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('35')),
-                  ],
-                ),
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('13',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('35')),
-                    DataCell(Text('20',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('25')),
-                  ],
-                ),
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('14',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('05,  35')),
-                    DataCell(Text('21',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('05')),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  } else if (schedule == 'C2') {
-    return Container(
-      color: color,
-      child: Center(
-        child: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: DataTable(
-              columns: const <DataColumn>[
-                DataColumn(label: Text('時', style: TextStyle(fontSize: 16))),
-                DataColumn(label: Text('分', style: TextStyle(fontSize: 16))),
-                DataColumn(label: Text('時', style: TextStyle(fontSize: 16))),
-                DataColumn(label: Text('分', style: TextStyle(fontSize: 16))),
-              ],
-              rows: const <DataRow>[
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('8',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(
-                      Text('50'),
-                    ),
-                    DataCell(Text('15',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('20,  50')),
-                  ],
-                ),
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('9',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(
-                      Text('40'),
-                    ),
-                    DataCell(Text('16',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('20')),
-                  ],
-                ),
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('10',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(
-                      Text('05,  50'),
-                    ),
-                    DataCell(Text('17',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('00,  30,  55')),
-                  ],
-                ),
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('11',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('15,  40')),
-                    DataCell(Text('18',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('20,  50')),
-                  ],
-                ),
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('12',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('10')),
-                    DataCell(Text('19',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('20,  50')),
-                  ],
-                ),
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('13',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('20,  50')),
-                    DataCell(Text('20',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('40')),
-                  ],
-                ),
-                DataRow(
-                  cells: <DataCell>[
-                    DataCell(Text('14',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('20,  50')),
-                    DataCell(Text('21',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                    DataCell(Text('30')),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  } else {
-    return Container();
-  }
+        );
+      }
+    },
+  );
 }
