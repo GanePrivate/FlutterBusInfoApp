@@ -12,7 +12,7 @@ class CalendarWidget extends StatelessWidget {
 
     return SingleChildScrollView(
       child: Container(
-        color: Color(0xFFF6F7C4).withOpacity(0.5),
+        color: const Color(0xFFF6F7C4).withOpacity(0.5),
         child: Column(
           children: calendarData.entries.map((entry) {
             final year = entry.key.year;
@@ -36,6 +36,7 @@ class CalendarWidget extends StatelessWidget {
     );
   }
 
+  // CSV データの文字列をパースして日付とモードのマップを作成する関数
   Map<DateTime, String> _parseCsvData(String csvData) {
     final lines = csvData.trim().split('\n');
     final dateModeMap = <DateTime, String>{};
@@ -56,7 +57,10 @@ class CalendarWidget extends StatelessWidget {
 
     dateModeMap.forEach((date, mode) {
       final yearMonth = DateTime(date.year, date.month);
+      // calendarData に yearMonth の Key がなければ
+      // (Datetime : 空のリスト) のデータを追加
       calendarData.putIfAbsent(yearMonth, () => []);
+      // 上記で追加したリストに実際に日付と mode のデータを追加
       calendarData[yearMonth]!.add(MapEntry(date.day, mode));
     });
 
