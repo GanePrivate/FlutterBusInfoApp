@@ -67,8 +67,11 @@ class _AllScheduleState extends State<AllSchedule> {
               ),
             )),
           ),
-          createScheduleTableContainer(
-              "A1", const Color(0xFFF6D6D6).withOpacity(0.5)),
+          SizedBox(
+            height: 400, // 固定の高さを設定
+            child: createScheduleTableContainer(
+                "A1", const Color(0xFFF6D6D6).withOpacity(0.5)),
+          ),
           Container(
             height: 50,
             color: const Color(0xFFF6D6D6),
@@ -82,8 +85,11 @@ class _AllScheduleState extends State<AllSchedule> {
               ),
             )),
           ),
-          createScheduleTableContainer(
-              "B1", const Color(0xFFF6D6D6).withOpacity(0.5)),
+          SizedBox(
+            height: 400, // 固定の高さを設定
+            child: createScheduleTableContainer(
+                "B1", const Color(0xFFF6D6D6).withOpacity(0.5)),
+          ),
           Container(
             height: 50,
             color: const Color(0xFFF6D6D6),
@@ -97,8 +103,11 @@ class _AllScheduleState extends State<AllSchedule> {
               ),
             )),
           ),
-          createScheduleTableContainer(
-              "C1", const Color(0xFFF6D6D6).withOpacity(0.5)),
+          SizedBox(
+            height: 400, // 固定の高さを設定
+            child: createScheduleTableContainer(
+                "C1", const Color(0xFFF6D6D6).withOpacity(0.5)),
+          ),
           Container(
             height: 40,
             color: const Color(0xFF7BD3EA),
@@ -126,8 +135,11 @@ class _AllScheduleState extends State<AllSchedule> {
               ),
             )),
           ),
-          createScheduleTableContainer(
-              "A2", const Color(0xFF7BD3EA).withOpacity(0.5)),
+          SizedBox(
+            height: 400, // 固定の高さを設定
+            child: createScheduleTableContainer(
+                "A2", const Color(0xFF7BD3EA).withOpacity(0.5)),
+          ),
           Container(
             height: 50,
             color: const Color(0xFF7BD3EA),
@@ -141,8 +153,11 @@ class _AllScheduleState extends State<AllSchedule> {
               ),
             )),
           ),
-          createScheduleTableContainer(
-              "B2", const Color(0xFF7BD3EA).withOpacity(0.5)),
+          SizedBox(
+            height: 400, // 固定の高さを設定
+            child: createScheduleTableContainer(
+                "B2", const Color(0xFF7BD3EA).withOpacity(0.5)),
+          ),
           Container(
             height: 50,
             color: const Color(0xFF7BD3EA),
@@ -156,22 +171,24 @@ class _AllScheduleState extends State<AllSchedule> {
               ),
             )),
           ),
-          createScheduleTableContainer(
-              "C2", const Color(0xFF7BD3EA).withOpacity(0.5)),
-
+          SizedBox(
+            height: 400, // 固定の高さを設定
+            child: createScheduleTableContainer(
+                "C2", const Color(0xFF7BD3EA).withOpacity(0.5)),
+          ),
           Container(
             height: 40,
             color: const Color(0xFFF6F7C4),
             margin: const EdgeInsets.only(top: 50),
             child: const Center(
                 child: Text(
-                  '運行スケジュール',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                )),
+              '運行スケジュール',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            )),
           ),
           CalendarWidget(),
         ],

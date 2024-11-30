@@ -97,3 +97,11 @@ flutter_launcher_icons:
   android: "launcher_icon"
   ios: false
   image_path: "lib/assets/icon/icon.png"
+
+flutter_icons:
+  ios: false
+  image_path: "lib/assets/icon/icon.png"
+  remove_alpha_ios: false
+  android: true
+  adaptive_icon_background: "lib/assets/icon/ic_launcher_adaptive_back.png"
+  adaptive_icon_foreground: "lib/assets/icon/ic_launcher_adaptive_fore.png"
