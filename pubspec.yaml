@@ -98,6 +98,8 @@ flutter_launcher_icons:
   ios: false
   image_path: "lib/assets/icon/icon.png"
 
+# 生成コマンド
+# flutter pub run flutter_launcher_icons:main
 flutter_icons:
   ios: false
   image_path: "lib/assets/icon/icon.png"
